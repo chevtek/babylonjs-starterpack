@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import {
   ArcRotateCamera,
+  AxesViewer,
   Color3,
   Engine,
   HemisphericLight,
@@ -15,22 +16,26 @@ function App() {
     if (!canvas) return;
     const engine = new Engine(canvas);
     const scene = new Scene(engine);
-    const mainCamera = new ArcRotateCamera("mainCamera", 0, Math.PI / 2, 10, Vector3.Zero(), scene);
-    const hudCamera = new ArcRotateCamera("hudCamera", 0, Math.PI / 2, 10, Vector3.Zero(), scene);
+    new AxesViewer(scene);
+    const mainCamera = new ArcRotateCamera("mainCamera", 0, Math.PI / 3, 10, Vector3.Zero(), scene);
+    const hudCamera = new ArcRotateCamera("hudCamera", 0, Math.PI / 3, 10, Vector3.Zero(), scene);
     mainCamera.onViewMatrixChangedObservable.add(() => {
       hudCamera.alpha = mainCamera.alpha;
       hudCamera.beta = mainCamera.beta;
     });
     mainCamera.attachControl(canvas, true);
-    const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
+    const light = new HemisphericLight("light", new Vector3(0.5, 1, 0.25), scene);
     light.intensity = 0.75;
-    const ground = MeshBuilder.CreateGround("ground", { width: 15, height: 10 }, scene);
+    const ground = MeshBuilder.CreateGround("ground", { width: 10, height: 10 }, scene);
+    const groundMaterial = new StandardMaterial("ground", scene);
+    groundMaterial.diffuseColor = Color3.Gray();
+    ground.material = groundMaterial;
 
-    const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 1 }, scene);
-    sphere.position.y = 0.5;
-    const sphereMaterial = new StandardMaterial("sphereMaterial", scene);
-    sphereMaterial.diffuseColor = Color3.Red();
-    sphere.material = sphereMaterial;
+    const box = MeshBuilder.CreateBox("box", { size: 1 }, scene);
+    box.position.y = 0.5;
+    const boxMaterial = new StandardMaterial("sphereMaterial", scene);
+    boxMaterial.diffuseColor = Color3.Green();
+    box.material = boxMaterial;
 
     window.onresize = () => {
       engine.resize();
