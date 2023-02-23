@@ -1,19 +1,26 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import {
+  ActionManager,
   ArcRotateCamera,
   AxesViewer,
   Color3,
   Engine,
+  ExecuteCodeAction,
   HemisphericLight,
   MeshBuilder,
   Scene,
   StandardMaterial,
   Vector3
 } from "@babylonjs/core";
+import store from "./store";
+import { changeColor } from "./store/slices/appSlice";
 
-function App() {
+function BabylonWorkspace() {
+
   const canvasRef = useCallback((canvas: HTMLCanvasElement) => {
     if (!canvas) return;
+
+    const initialState = store.getState();
     const engine = new Engine(canvas);
     const scene = new Scene(engine);
     new AxesViewer(scene);
@@ -34,8 +41,16 @@ function App() {
     const box = MeshBuilder.CreateBox("box", { size: 1 }, scene);
     box.position.y = 0.5;
     const boxMaterial = new StandardMaterial("sphereMaterial", scene);
-    boxMaterial.diffuseColor = Color3.Green();
+    boxMaterial.diffuseColor = initialState.app.boxColor;
+    store.subscribe(() => {
+      boxMaterial.diffuseColor = store.getState().app.boxColor;
+    });
     box.material = boxMaterial;
+
+    box.actionManager = new ActionManager(scene);
+    box.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPickTrigger, evt => {
+      store.dispatch(changeColor(Color3.Yellow()));
+    }));
 
     window.onresize = () => {
       engine.resize();
@@ -53,4 +68,4 @@ function App() {
   />;
 }
 
-export default App;
+export default BabylonWorkspace;
