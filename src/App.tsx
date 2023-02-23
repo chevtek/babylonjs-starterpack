@@ -1,5 +1,5 @@
-import BabylonWorkspace from "./BabylonWorkspace";
-const env = import.meta.env.MODE;
+import BabylonWorkspace from "./BabylonWorkspace"
+const env = import.meta.env.MODE
 
 function App() {
   return (
@@ -7,7 +7,7 @@ function App() {
       <h1>env: {env}</h1>
       <BabylonWorkspace />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
